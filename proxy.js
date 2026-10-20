@@ -20,9 +20,9 @@ export async function proxy(request) {
   if (pathname.startsWith("/admin")) {
     let response = NextResponse.next({ request });
 
-    // Buat Supabase client yang membaca cookie dari request
+    const url = process.env.SUPABASE_URL?.replace(/\/rest\/v1\/?$/, "")?.replace(/\/+$/, "");
     const supabase = createServerClient(
-      process.env.SUPABASE_URL,
+      url,
       process.env.SUPABASE_PUBLISHABLE_KEY,
       {
         cookies: {
