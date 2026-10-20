@@ -47,6 +47,5 @@ Identitas toko (nama, nomor WhatsApp, alamat, jam buka) ada di `lib/toko.js`.
 2. Ubah hanya file yang disebut atau yang memang dibutuhkan fitur itu.
 3. Pakai komponen yang sudah ada di `components/` sebelum membuat yang baru.
 4. Jangan memasang paket npm baru tanpa diminta.
-5. Jangan menjalankan perintah Git apa pun (commit, push, dan lainnya dilakukan manual oleh pengguna).
-6. Hapus komponen `CatatanBelumAktif` dari halaman yang fiturnya sudah selesai.
-7. Setelah selesai, jelaskan singkat: file apa saja yang diubah dan cara mengetesnya.
+5. Hapus komponen `CatatanBelumAktif` dari halaman yang fiturnya sudah selesai.
+6. Setelah selesai, jelaskan singkat: file apa saja yang diubah dan cara mengetesnya.
