@@ -45,3 +45,31 @@ export async function keluar() {
   redirect("/admin/login");
 }
 
+export async function gantiPassword(prevState, formData) {
+  const passwordBaru = formData.get("password_baru");
+  const konfirmasi = formData.get("konfirmasi_password");
+
+  // Validasi di server
+  if (!passwordBaru || passwordBaru.length < 8) {
+    return { ok: false, pesan: "Password baru minimal 8 karakter." };
+  }
+  if (passwordBaru !== konfirmasi) {
+    return { ok: false, pesan: "Konfirmasi password tidak cocok." };
+  }
+
+  const supabase = buatSupabaseAuth();
+
+  // Pastikan admin sedang login
+  const { data: { user }, error: errSesi } = await supabase.auth.getUser();
+  if (errSesi || !user) {
+    redirect("/admin/login");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password: passwordBaru });
+  if (error) {
+    return { ok: false, pesan: `Gagal mengganti password: ${error.message}` };
+  }
+
+  return { ok: true, pesan: "Password berhasil diganti." };
+}
+
