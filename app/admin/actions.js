@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import { buatSupabaseAuth, ambilUser } from "@/lib/supabase-auth";
 import { buatSupabaseServer } from "@/lib/supabase";
 
@@ -134,5 +135,29 @@ export async function ubahProduk(idOrPrevState, prevStateOrFormData, maybeFormDa
     return { ok: false, pesan: `Gagal memperbarui produk: ${error.message}` };
   }
 
+  redirect("/admin");
+}
+
+export async function hapusProduk(formData) {
+  // Aturan keamanan #3: periksa login di server sebelum mengubah data
+  const user = await ambilUser();
+  if (!user) {
+    redirect("/admin/login");
+  }
+
+  const id = formData.get("id");
+  if (!id) {
+    return { ok: false, pesan: "ID produk tidak valid." };
+  }
+
+  const supabase = buatSupabaseServer();
+  const { error } = await supabase.from("produk").delete().eq("id", id);
+
+  if (error) {
+    return { ok: false, pesan: `Gagal menghapus produk: ${error.message}` };
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/");
   redirect("/admin");
 }
