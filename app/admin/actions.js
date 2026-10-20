@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { buatSupabaseAuth, ambilUser } from "@/lib/supabase-auth";
+import { buatSupabaseServer } from "@/lib/supabase";
 
 export async function login(prevState, formData) {
   const email = formData.get("email");
@@ -49,4 +50,37 @@ export async function gantiPassword(prevState, formData) {
   }
 
   return { ok: true, pesan: "Password berhasil diganti." };
+}
+
+export async function tambahProduk(prevState, formData) {
+  // Aturan keamanan #3: periksa login di server sebelum mengubah data
+  const user = await ambilUser();
+  if (!user) {
+    redirect("/admin/login");
+  }
+
+  const nama = formData.get("nama")?.toString().trim();
+  const harga = Number(formData.get("harga"));
+  const kategori = formData.get("kategori")?.toString().trim() || null;
+  const foto_url = formData.get("foto_url")?.toString().trim() || null;
+  const deskripsi = formData.get("deskripsi")?.toString().trim() || null;
+
+  // Validasi minimal di server
+  if (!nama) {
+    return { ok: false, pesan: "Nama produk wajib diisi." };
+  }
+  if (!harga || isNaN(harga) || harga < 0) {
+    return { ok: false, pesan: "Harga harus berupa angka positif." };
+  }
+
+  const supabase = buatSupabaseServer();
+  const { error } = await supabase
+    .from("produk")
+    .insert({ nama, harga, kategori, foto_url, deskripsi });
+
+  if (error) {
+    return { ok: false, pesan: `Gagal menyimpan produk: ${error.message}` };
+  }
+
+  redirect("/admin");
 }
